@@ -1,7 +1,7 @@
 import { Component, inject } from '@angular/core';
 //import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';    // replaced by FormBuilder code implementation
 import { ReactiveFormsModule } from '@angular/forms'; 
-import { FormBuilder } from '@angular/forms';
+import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
   selector: 'app-profile-editor',
@@ -24,7 +24,7 @@ export class ProfileEditorComponent {
   private formBuilder = inject(FormBuilder);
 
   profileForm = this.formBuilder.group({
-    firstName: [''],
+    firstName: ['', Validators.required],
     lastName: [''],
     address: this.formBuilder.group({
       street: [''],
