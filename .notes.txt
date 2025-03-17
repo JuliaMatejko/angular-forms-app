@@ -346,3 +346,79 @@ This is necessary because the   patchValue()   method applies the update against
   PatchValue()   only updates properties that the form model   defines  .
 
 
+--- Using the   FormBuilder   service to generate controls ---
+
+Creating form control instances manually can become repetitive when dealing with multiple forms.
+The   FormBuilder service  provides convenient methods   for generating controls  .
+
+Use the following steps to take advantage of this service.
+
+1. Import the   FormBuilder   class.
+2. Inject the   FormBuilder service  .
+3.   Generate   the form contents.
+
+The following examples show how to refactor the   ProfileEditor   component   to use the form builder service   to create form control and form group instances.
+
+-- 1. Import the FormBuilder class --
+
+Import the   FormBuilder   class from the @angular/forms package.
+
+import {FormBuilder} from '@angular/forms';
+
+-- 2. Inject the FormBuilder service --
+
+The   FormBuilder service   is an injectable provider from the reactive forms module.
+Use the   inject()   function to inject this dependency in your component.
+
+private formBuilder = inject(FormBuilder);
+
+-- 3. Generate form controls --
+
+The   FormBuilder service   has three methods:   control(),   group(),  and   array()  .
+These are   factory methods   for generating instances in your component classes
+including   form controls,   form groups,   and   form arrays.   Use the   group   method to create the   profileForm   controls.
+
+import {Component, inject} from '@angular/core';
+import {FormBuilder} from '@angular/forms';
+
+...
+@Component({
+  selector: 'app-profile-editor',
+  templateUrl: './profile-editor.component.html',
+  styleUrls: ['./profile-editor.component.css'],
+  standalone: false,
+})
+export class ProfileEditorComponent {
+  private formBuilder = inject(FormBuilder);
+  profileForm = this.formBuilder.group({
+    firstName: [''],
+    lastName: [''],
+    address: this.formBuilder.group({
+      street: [''],
+      city: [''],
+      state: [''],
+      zip: [''],
+    }),
+...
+  });
+...
+}
+
+In the preceding example, you use the   group()   method with the same object to define the properties in the model.
+The value for each control name is an array containing the initial value as the first item in the array.
+
+Tip: You can define the control with just the initial value, but if your controls need   sync or async validation  ,
+  add sync and async validators   as the   second and third items   in the array.
+  
+Compare using the form builder to creating the instances manually.
+
+profileForm = new FormGroup({
+    firstName: new FormControl(''),
+    lastName: new FormControl(''),
+    address: new FormGroup({
+      street: new FormControl(''),
+      city: new FormControl(''),
+      state: new FormControl(''),
+      zip: new FormControl(''),
+    }),
+  });

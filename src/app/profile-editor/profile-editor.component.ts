@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
+import { Component, inject } from '@angular/core';
+//import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';    // replaced by FormBuilder code implementation
+import { ReactiveFormsModule } from '@angular/forms'; 
+import { FormBuilder } from '@angular/forms';
 
 @Component({
   selector: 'app-profile-editor',
@@ -8,19 +10,31 @@ import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';
   styleUrl: './profile-editor.component.css',
 })
 export class ProfileEditorComponent {
-  profileForm = new FormGroup({
-    firstName: new FormControl(''),
-    lastName: new FormControl(''),
-    address: new FormGroup({
-      street: new FormControl(''),
-      city: new FormControl(''),
-      state: new FormControl(''),
-      zip: new FormControl(''),
+  // profileForm = new FormGroup({                    // replaced by FormBuilder code implementation
+  //   firstName: new FormControl(''),
+  //   lastName: new FormControl(''),
+  //   address: new FormGroup({
+  //     street: new FormControl(''),
+  //     city: new FormControl(''),
+  //     state: new FormControl(''),
+  //     zip: new FormControl(''),
+  //   }),
+  // });
+
+  private formBuilder = inject(FormBuilder);
+
+  profileForm = this.formBuilder.group({
+    firstName: [''],
+    lastName: [''],
+    address: this.formBuilder.group({
+      street: [''],
+      city: [''],
+      state: [''],
+      zip: [''],
     }),
   });
 
   onSubmit() {
-    // TODO: Use EventEmitter with form value
     console.warn(this.profileForm.value);
   }
 
