@@ -486,3 +486,147 @@ The   Submit   button is disabled because   profileForm   is invalid due to the 
 After you fill out the   firstName   input, the form becomes valid and the Submit button is enabled.
 
 For more on form validation, visit the Form Validation guide.    -->   https://angular.dev/guide/forms/form-validation
+
+
+--- Creating dynamic forms ---
+
+  FormArray   is an alternative to   FormGroup   for managing   any number of unnamed controls  .
+
+As with form group instances,  you can   dynamically   insert and remove controls   from form array instances,
+and the   form array instance value   and   validation status   is calculated from its child controls.
+However, you   don't need to define a key for each control by name,   so this is a great option if you   don't know the   number   of child values in advance.
+
+To define   a dynamic form,   take the following steps.
+
+1.   Import   the   FormArray   class.
+2.   Define a   FormArray control.
+3.   Access   the FormArray control with a   getter   method.
+4.   Display   the form array in a template.
+
+The following example shows you how to manage an array of   aliases   in ProfileEditor.
+
+
+-- 1. Import the   FormArray   class --
+
+Import the   FormArray   class from   @angular/forms   to use for type information.
+The   FormBuilder   service is ready to create a   FormArray   instance.
+
+import {FormArray} from '@angular/forms';
+
+
+-- 2. Define a   FormArray   control --
+
+You can initialize a form array with   any number of controls,   from zero to many,   by defining them in an array.
+Add an   aliases   property to the   form group instance   for   profileForm   to define the form array.
+
+Use the   FormBuilder.array()   method to define the array, and the   FormBuilder.control()   method to populate the array with an initial control.
+
+profileForm = this.formBuilder.group({
+    firstName: ['', Validators.required],
+    lastName: [''],
+    address: this.formBuilder.group({
+      street: [''],
+      city: [''],
+      state: [''],
+      zip: [''],
+    }),
+    aliases: this.formBuilder.array([this.formBuilder.control('')]),
+  });
+
+The   aliases control   in the form group instance is now populated with a single control until more controls are added dynamically.
+
+
+-- 3. Access the   FormArray   control --
+
+A getter provides access to the aliases in the form array instance compared to repeating the   profileForm.get()   method to get each instance.
+
+The form array instance represents an undefined number of controls in an array.
+It's convenient to access a control through a getter, and this approach is straightforward to repeat for additional controls.
+
+Use the getter syntax to create an   aliases   class property to retrieve the   alias's form array control   from the parent form group.
+
+get aliases() {
+    return this.profileForm.get('aliases') as FormArray;
+  }
+
+Because the returned control is of the type   AbstractControl,   you need to provide an   explicit type   to access the   method syntax for the form array instance.
+  
+Define a method   to dynamically insert an   alias control   into the   alias's form array.
+The   FormArray.push() method   inserts the control as a new item in the array.
+
+addAlias() {
+    this.aliases.push(this.formBuilder.control(''));
+}
+
+In the template, each control is displayed as   a separate input field  .
+
+
+-- 4. Display the form array in the template --
+
+To attach the aliases from your form model, you must add it to the template.
+Similar to the   formGroupName   input   provided by   FormGroupNameDirective  ,   formArrayName   binds communication from the form array instance to the template
+with   FormArrayNameDirective  .
+
+Add the following template HTML after the   <div>   closing the   formGroupName   element.
+
+<div formArrayName="aliases">
+    <h2>Aliases</h2>
+    <button type="button" (click)="addAlias()">+ Add another alias</button>
+    <div *ngFor="let alias of aliases.controls; let i=index">
+      <!-- The repeated alias template -->
+      <label for="alias-{{ i }}">Alias:</label>
+      <input id="alias-{{ i }}" type="text" [formControlName]="i">
+    </div>
+  </div>
+
+The   *ngFor   directive   iterates over each form control instance provided by the aliases form array instance.
+Because form array elements are unnamed, you assign the index to the   i   variable and pass it to each control to bind it to the   formControlName   input.
+
+Each time a new alias instance is added, the new form array instance is provided its control based on the index.
+This lets you track each individual control when calculating the status and value of the root control.
+
+-- 5. Add an alias --
+
+Initially, the form contains one   Alias   field. To add another field, click the   Add Alias   button.
+You can also validate the array of aliases reported by the form model displayed by Form Value at the bottom of the template.
+Instead of a form control instance for each alias, you can compose another form group instance with additional fields.
+The process of defining a control for each item is the same.
+
+
+--- Reactive forms API summary ---
+
+The following table lists the base   classes   and   services   used to create and manage reactive form controls. 
+For complete syntax details, see the API reference documentation for the Forms package.
+
+-- Classes
+
+Class	                  Details
+
+AbstractControl	    The abstract base class for the concrete form control classes   FormControl,   FormGroup,   and   FormArray.
+                    It provides their common behaviors and properties.
+
+FormControl	        Manages the value and validity status of an individual form control. It corresponds to an HTML form control such as   <input>   or   <select>.
+
+FormGroup	          Manages the value and validity state of a   group of AbstractControl instances  .
+                    The group's properties include its child controls. The top-level form in your component is  FormGroup .
+
+FormArray         	Manages the value and validity state of a numerically indexed array of AbstractControl instances.
+
+FormBuilder	        An   injectable service   that provides factory methods   for creating control instances  .
+
+FormRecord	        Tracks the value and validity state of   a collection of FormControl instances,   each of which has the   same value type  .
+
+
+-- Directives
+
+Directive	                  Details
+
+FormControlDirective	    Syncs a   standalone FormControl instance   to a form control element.
+
+FormControlName	          Syncs   FormControl  in an existing  FormGroup  instance to a form control element by name.
+
+FormGroupDirective	      Syncs an existing   FormGroup  instance to a DOM element.
+
+FormGroupName	            Syncs a nested  FormGroup  instance to a DOM element.
+
+FormArrayName	            Syncs a nested  FormArray  instance to a DOM element.

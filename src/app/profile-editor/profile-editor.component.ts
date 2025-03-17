@@ -1,11 +1,12 @@
 import { Component, inject } from '@angular/core';
 //import { FormGroup, FormControl, ReactiveFormsModule } from '@angular/forms';    // replaced by FormBuilder code implementation
-import { ReactiveFormsModule } from '@angular/forms'; 
-import { FormBuilder, Validators } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, FormArray } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-profile-editor',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, CommonModule],
   templateUrl: './profile-editor.component.html',
   styleUrl: './profile-editor.component.css',
 })
@@ -32,7 +33,16 @@ export class ProfileEditorComponent {
       state: [''],
       zip: [''],
     }),
+    aliases: this.formBuilder.array([this.formBuilder.control('')]),
   });
+
+  get aliases() {
+    return this.profileForm.get('aliases') as FormArray;
+  }
+
+  addAlias() {
+    this.aliases.push(this.formBuilder.control(''));
+  }
 
   onSubmit() {
     console.warn(this.profileForm.value);
